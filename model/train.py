@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import joblib
 # Load dataset
-df = pd.read_csv("../dataset/PhiUSIIL_Phishing_URL_Dataset.csv")
+df = pd.read_csv("phishshield_training_dataset.csv")
 
 # Basic Information
 print(df.head())
@@ -23,18 +23,26 @@ print(df["label"].value_counts())
 # Features and Target
 # Remove string columns
 selected_features = [
+
     "URLLength",
     "DomainLength",
     "IsDomainIP",
+    "URLSimilarityIndex",
+    "CharContinuationRate",
+    "TLDLegitimateProb",
+    "URLCharProb",
+    "TLDLength",
     "NoOfSubDomain",
-    "IsHTTPS",
-    "HasTitle",
-    "HasFavicon",
-    "HasPasswordField",
-    "HasHiddenFields",
-    "HasSubmitButton",
-    "HasExternalFormSubmit",
-    "NoOfPopup"
+    "HasObfuscation",
+    "NoOfObfuscatedChar",
+    "ObfuscationRatio",
+    "NoOfLettersInURL",
+    "LetterRatioInURL",
+    "NoOfDegitsInURL",
+    "DegitRatioInURL",
+    "NoOfOtherSpecialCharsInURL",
+    "SpacialCharRatioInURL",
+    "IsHTTPS"
 ]
 
 X = df[selected_features]
@@ -55,7 +63,7 @@ model = RandomForestClassifier(
 
 # Train Model
 print(df["label"].value_counts())
-print(df[["URL", "label"]].head(20))
+print(df.head(20))
 model.fit(X_train, y_train)
 print(model.classes_)
 

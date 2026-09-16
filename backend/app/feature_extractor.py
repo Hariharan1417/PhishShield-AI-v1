@@ -1,37 +1,72 @@
-from urllib.parse import urlparse
-import re
+from .feature_pipeline_v3 import build_feature_vector
+
+
+FEATURE_ORDER = [
+
+    "URLLength",
+    "DomainLength",
+    "IsDomainIP",
+    "URLSimilarityIndex",
+    "CharContinuationRate",
+    "TLDLegitimateProb",
+    "URLCharProb",
+    "TLDLength",
+    "NoOfSubDomain",
+
+    "HasObfuscation",
+    "NoOfObfuscatedChar",
+    "ObfuscationRatio",
+
+    "NoOfLettersInURL",
+    "LetterRatioInURL",
+    "NoOfDegitsInURL",
+    "DegitRatioInURL",
+    "NoOfOtherSpecialCharsInURL",
+    "SpacialCharRatioInURL",
+
+    "IsHTTPS",
+
+    "HasTitle",
+    "HasFavicon",
+    "HasDescription",
+    "HasPasswordField",
+    "HasHiddenFields",
+    "HasSubmitButton",
+    "HasExternalFormSubmit",
+    "NoOfPopup",
+    "NoOfiFrame",
+
+    "NoOfExternalRef",
+    "NoOfSelfRef",
+    "NoOfEmptyRef",
+    "NoOfURLRedirect",
+
+    "HasSocialNet",
+    "HasCopyrightInfo",
+    "Robots",
+    "IsResponsive",
+
+    "DomainTitleMatchScore",
+    "URLTitleMatchScore"
+]
+
 
 def extract_features(data):
 
-    parsed = urlparse(data.url)
+    feature_dict = build_feature_vector(data)
 
-    domain = parsed.netloc
+    print("\n========== V3 FEATURE VECTOR ==========")
 
-    # Is Domain an IP?
-    is_domain_ip = 1 if re.match(r"^\d+\.\d+\.\d+\.\d+$", domain) else 0
+    features = []
 
-    features = [
-    len(data.url),                         # URLLength
-    len(domain),                           # DomainLength
-    is_domain_ip,                          # IsDomainIP
-    max(0, len(domain.split(".")) - 2),    # NoOfSubDomain
-    1 if parsed.scheme == "https" else 0,  # IsHTTPS
-    1 if data.title else 0,                # HasTitle
-    data.hasFavicon,                       # HasFavicon
-    1 if data.passwordFields > 0 else 0,   # HasPasswordField
-    data.hasHiddenFields,                  # HasHiddenFields
-    data.hasSubmitButton,                  # HasSubmitButton
-    data.hasExternalFormSubmit,            # HasExternalFormSubmit
-    data.noOfPopup                         # NoOfPopup
-]
-    print({
-    "url": data.url,
-    "features": features,
-    "hasFavicon": data.hasFavicon,
-    "hasHiddenFields": data.hasHiddenFields,
-    "hasSubmitButton": data.hasSubmitButton,
-    "hasExternalFormSubmit": data.hasExternalFormSubmit,
-    "passwordFields": data.passwordFields
-})
+    for name in FEATURE_ORDER:
+
+        value = feature_dict.get(name, 0)
+
+        features.append(value)
+
+        print(f"{name:<30} : {value}")
+
+    print("\nTotal Features:", len(features))
 
     return features

@@ -1,18 +1,19 @@
 {
   "manifest_version": 3,
   "name": "PhishShield AI",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "AI Powered Browser Extension for Real-Time Phishing Website Detection",
 
   "permissions": [
     "activeTab",
     "tabs",
-    "storage"
+    "storage",
+    "webNavigation"
   ],
 
   "host_permissions": [
     "<all_urls>",
-     "http://127.0.0.1:8000/*"
+    "http://127.0.0.1:8000/*"
   ],
 
   "background": {
@@ -25,6 +26,11 @@
         "<all_urls>"
       ],
       "js": [
+        "utils.js",
+        "ui.js",
+        "scanner.js",
+        "detector.js",
+        "observer.js",
         "content.js"
       ]
     }

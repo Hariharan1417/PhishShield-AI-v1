@@ -1,131 +1,227 @@
-const host = window.location.hostname;
+/* =========================================================
+   PhishShield AI V2
+   content.js
+========================================================= */
 
-if (host === "localhost" || host === "127.0.0.1") {
-  console.log("Skipping localhost page.");
-} else {
-  console.log("🛡️ PhishShield AI Started");
+console.log("🛡️ PhishShield AI content script loaded");
 
-  // ----------------------
-  // Collect Page Info
-  // ----------------------
 
-  const pageInfo = {
-    url: window.location.href,
-    title: document.title,
-    protocol: window.location.protocol,
+// =========================================================
+// Check scanner availability
+// =========================================================
 
-    forms: document.forms.length,
-    passwordFields: document.querySelectorAll("input[type='password']").length,
-    emailFields: document.querySelectorAll("input[type='email']").length,
-    links: document.links.length,
+function scannerAvailable() {
+    return (
+        window.PhishShield &&
+        window.PhishShield.Scanner &&
+        typeof window.PhishShield.Scanner.collectPageInfo === "function"
+    );
+}
 
-    hasFavicon:
-      document.querySelector("link[rel*='icon']") ? 1 : 0,
 
-    hasHiddenFields:
-      document.querySelectorAll("input[type='hidden']").length > 0 ? 1 : 0,
+// =========================================================
+// Scan Current Page
+// =========================================================
 
-    hasSubmitButton:
-      document.querySelectorAll(
-        "input[type='submit'], button[type='submit']"
-      ).length > 0
-        ? 1
-        : 0,
+async function scanCurrentPage() {
 
-    hasExternalFormSubmit:
-      [...document.forms].some((form) => {
-        const action = form.getAttribute("action");
+    console.log("🔍 Starting PhishShield scan...");
 
-        return (
-          action &&
-          action.startsWith("http") &&
-          !action.includes(window.location.hostname)
+    if (!scannerAvailable()) {
+
+        console.error(
+            "❌ PhishShield Scanner is not available"
         );
-      })
-        ? 1
-        : 0,
 
-    noOfPopup: 0,
-  };
+        throw new Error(
+            "Scanner is not available on this page."
+        );
+    }
 
-  console.table(pageInfo);
 
-  // ----------------------
-  // Create Banner
-  // ----------------------
+    try {
 
-  const banner = document.createElement("div");
+        // ---------------------------------------------
+        // Collect page features
+        // ---------------------------------------------
 
-  banner.innerText = "🛡️ PhishShield AI | Analyzing Website...";
+        const pageInfo =
+            window.PhishShield.Scanner.collectPageInfo();
 
-  banner.style.position = "fixed";
-  banner.style.top = "0";
-  banner.style.left = "0";
-  banner.style.width = "100%";
-  banner.style.background = "#0f172a";
-  banner.style.color = "white";
-  banner.style.padding = "12px";
-  banner.style.textAlign = "center";
-  banner.style.fontSize = "16px";
-  banner.style.fontWeight = "bold";
-  banner.style.whiteSpace = "pre-line";
-  banner.style.zIndex = "999999";
 
-  document.body.prepend(banner);
+        console.log(
+            "📊 Page information collected:",
+            pageInfo
+        );
 
-  // ----------------------
-  // Send Request
-  // ----------------------
 
-  fetch("http://127.0.0.1:8000/analyze", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(pageInfo),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.status === "Safe") {
-        banner.style.background = "#15803d";
-      } else if (data.status === "Suspicious") {
-        banner.style.background = "#ca8a04";
-      } else {
-        banner.style.background = "#dc2626";
-      }
+        // ---------------------------------------------
+        // Send features to detector
+        // ---------------------------------------------
 
-      let reasonsText = "";
+        if (
+            window.PhishShield.Detector &&
+            typeof window.PhishShield.Detector.analyze === "function"
+        ) {
 
-      if (data.reasons?.length) {
-        reasonsText = data.reasons
-          .map((reason) =>
-            reason.type === "positive"
-              ? "✔ " + reason.message
-              : "⚠ " + reason.message
-          )
-          .join("\n");
-      }
+            console.log(
+                "🤖 Sending data to Detector..."
+            );
 
-      banner.innerText = `${
-        data.status === "Safe"
-          ? "🟢"
-          : data.status === "Suspicious"
-          ? "🟡"
-          : "🔴"
-      } ${data.status} Website
+            const result =
+                await window.PhishShield.Detector.analyze(
+                    pageInfo
+                );
 
-Risk Score : ${data.riskScore}
-Source : ${data.source}
 
-${reasonsText}`;
-    })
-    .catch((error) => {
-      console.error(error);
+            console.log(
+                "✅ Detection result:",
+                result
+            );
 
-      banner.style.background = "#dc2626";
 
-      banner.innerText = `❌ Backend Connection Failed
+            return result;
+        }
 
-Unable to connect to FastAPI Server.`;
-    });
+
+        // ---------------------------------------------
+        // If detector isn't exposed,
+        // return collected features
+        // ---------------------------------------------
+
+        console.warn(
+            "⚠️ Detector analyze() not available."
+        );
+
+        return {
+            success: true,
+            pageInfo: pageInfo
+        };
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Scan failed:",
+            error
+        );
+
+        throw error;
+    }
+}
+
+
+// =========================================================
+// Message Listener
+// =========================================================
+
+chrome.runtime.onMessage.addListener(
+    (message, sender, sendResponse) => {
+
+        console.log(
+            "📩 PhishShield message:",
+            message
+        );
+
+
+        // =================================================
+        // SCAN AGAIN
+        // =================================================
+
+        if (
+            message &&
+            message.action === "scanAgain"
+        ) {
+
+            scanCurrentPage()
+
+                .then((result) => {
+
+                    console.log(
+                        "✅ Scan completed"
+                    );
+
+                    sendResponse({
+                        success: true,
+                        result: result
+                    });
+
+                })
+
+                .catch((error) => {
+
+                    console.error(
+                        "❌ Scan failed:",
+                        error
+                    );
+
+                    sendResponse({
+                        success: false,
+                        error: error.message
+                    });
+
+                });
+
+
+            // Keep message channel open
+            return true;
+        }
+
+
+        // =================================================
+        // GET CURRENT URL
+        // =================================================
+
+        if (
+            message &&
+            message.action === "getCurrentURL"
+        ) {
+
+            sendResponse({
+                success: true,
+                url: window.location.href
+            });
+
+            return true;
+        }
+
+
+        // =================================================
+        // PING
+        // =================================================
+
+        if (
+            message &&
+            message.action === "ping"
+        ) {
+
+            sendResponse({
+                success: true,
+                scannerAvailable: scannerAvailable(),
+                url: window.location.href
+            });
+
+            return true;
+        }
+
+    }
+);
+
+
+// =========================================================
+// Initial Status
+// =========================================================
+
+if (scannerAvailable()) {
+
+    console.log(
+        "✅ PhishShield Scanner ready"
+    );
+
+} else {
+
+    console.warn(
+        "⚠️ PhishShield Scanner not ready yet"
+    );
+
 }

@@ -1,20 +1,68 @@
+# ==============================
 # Python
+# ==============================
 __pycache__/
 *.py[cod]
-*.pkl
-venv/
-.env
+*.pyo
+*.pyd
 
-# Node
-node_modules/
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+# Python build files
+*.egg-info/
+build/
 dist/
 
-# Dataset
+# ==============================
+# Node / React / Vite
+# ==============================
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ==============================
+# Datasets / Large Training Files
+# ==============================
 dataset/
+*.csv
 
+# Keep the OpenPhish cache if it is required by the backend
+!backend/app/openphish_cache.txt
+
+# ==============================
 # Database
+# ==============================
 *.db
+*.sqlite
+*.sqlite3
 
-# IDE
+# ==============================
+# IDE / Editor
+# ==============================
 .vscode/
 .idea/
+.kiro/
+
+# ==============================
+# Testing / Temporary Files
+# ==============================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary deployment files
+*-deploy.txt
+
+# ==============================
+# OS
+# ==============================
+.DS_Store
+Thumbs.db

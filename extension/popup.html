@@ -1,17 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhishShield AI</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
 
-<h2>🛡️ PhishShield AI</h2>
+    <!-- Ambient Glowing Glass Orbs Behind Backdrop -->
+    <div class="glass-orb glass-orb-1"></div>
+    <div class="glass-orb glass-orb-2"></div>
+    <div class="glass-orb glass-orb-3"></div>
 
-<p>Extension Loaded Successfully</p>
+    <div class="popup-container">
 
-<script src="popup.js"></script>
+        <!-- ==========================================
+             HEADER
+        =========================================== -->
+        <header class="header glass-panel">
+            <div class="brand">
+                <div class="shield-logo glass-glow">
+                    🛡️
+                </div>
+                <div class="brand-text">
+                    <h1>PhishShield <span>AI</span></h1>
+                    <p>Real-Time Threat Protection</p>
+                </div>
+            </div>
+
+            <div class="live-status glass-pill">
+                <span class="live-dot"></span>
+                <span>LIVE</span>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             CURRENT WEBSITE
+        =========================================== -->
+        <section class="website-card glass-panel">
+            <div class="card-header">
+                <span class="card-title">🌐 Current Website</span>
+            </div>
+            <div class="url-box glass-inset">
+                <span class="url-icon">🔒</span>
+                <span id="currentWebsite" class="url-text" title="Current Website">
+                    Detecting website...
+                </span>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECURITY STATUS & RESULT
+        =========================================== -->
+        <section class="security-card glass-panel">
+            <div class="status-glow" id="statusGlow"></div>
+
+            <div class="shield-animation">
+                <div class="shield-ring"></div>
+                <div class="status-icon glass-inset" id="statusIcon">
+                    🔍
+                </div>
+            </div>
+
+            <div class="status-content">
+                <div id="status" class="status-title">
+                    Analyzing...
+                </div>
+                <p id="statusMessage" class="status-message">
+                    Checking website security...
+                </p>
+            </div>
+
+            <!-- ======================================
+                 RISK SCORE
+            ======================================= -->
+            <div class="risk-section">
+                <div class="risk-header">
+                    <span>Risk Score</span>
+                    <strong>
+                        <span id="riskScore">0</span>
+                        <small>/100</small>
+                    </strong>
+                </div>
+
+                <div class="risk-bar glass-inset">
+                    <div id="riskProgress" class="risk-progress"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             ACTION BUTTONS
+        =========================================== -->
+        <section class="actions">
+            <button id="viewAnalysisBtn" class="btn btn-primary glass-btn">
+                <span>📊</span>
+                <span>View Result</span>
+                <span>→</span>
+            </button>
+
+            <button id="scanBtn" class="btn btn-secondary glass-btn">
+                <span>↻</span>
+                <span>Scan Tab</span>
+            </button>
+        </section>
+
+        <!-- ==========================================
+             FOOTER
+        =========================================== -->
+        <footer class="footer">
+            <div class="footer-security">
+                <span class="footer-dot"></span>
+                <span>Protected by PhishShield AI</span>
+            </div>
+            <span>v2.0</span>
+        </footer>
+
+    </div>
+
+    <script src="popup.js"></script>
 
 </body>
+
 </html>

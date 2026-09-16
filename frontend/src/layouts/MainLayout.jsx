@@ -1,7 +1,16 @@
+import { useLocation } from "react-router-dom";
+
 function MainLayout({ children }) {
+  const location = useLocation();
+
   return (
-    <div className="flex min-h-screen bg-slate-950 text-white">
-      {children}
+    <div className="min-h-screen bg-slate-950 text-slate-200">
+      <div
+        key={location.pathname}
+        className="page-transition flex min-h-screen"
+      >
+        {children}
+      </div>
     </div>
   );
 }
